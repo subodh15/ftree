@@ -25,8 +25,8 @@ public class StaticDBImpl implements PersistanceManager{
          persondb = (Vector<Person>)object;
          log.info("Read " +persondb.size() + " members from offline db file at "  + inputfile.getAbsolutePath());
       } catch (Exception e) {
-         e.printStackTrace();
-         log.warning("Exception reading database file : " + inputfile.getAbsolutePath() + ":" + e.toString());
+        // e.printStackTrace();
+         log.fine("Exception reading database file : " + inputfile.getAbsolutePath() + ":" + e.toString());
       }
    }
 
