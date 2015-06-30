@@ -26,7 +26,7 @@ public class Person implements Serializable {
 
    private Sex sex;
    private UUID uuid ;
-   
+
    public transient static Logger log = Logger.getLogger("com.genealogy.model");
    /**
     * 
@@ -85,14 +85,14 @@ public class Person implements Serializable {
             this.relations.add(new FamilyRelation(this ,right, Relationship.CHILD)  );
          }
       }
-      
+
       Person spouse = this.getSpouse();
       if ( spouse != null ) {
          FamilyRelation parentRel = new FamilyRelation(child, spouse, spouse.sex == Sex.MALE ? Relationship.FATHER : Relationship.MOTHER);
          child.relations.add(parentRel);
       }
    }
-   
+
    public void addGrandParent(Person grandParent) {
       this.relations.add( new FamilyRelation(this ,grandParent, Relationship.GRANDPARENT) );
    }
@@ -119,7 +119,7 @@ public class Person implements Serializable {
    public void removeRelation(FamilyRelation targetRelation) {
       this.relations.remove(targetRelation);
    }
-   
+
    /**
     * Helper to check if we have person as a child.
     * @param right
@@ -276,21 +276,72 @@ public class Person implements Serializable {
    public void setUuid(UUID uuid) {
       this.uuid = uuid;
    }
-   
+
    @Override
    public int hashCode() {
       return ( this.getUID().toString() ).hashCode();
    }
-   
+
    @Override
    public boolean equals(Object o) 
    {
-       if (o instanceof Person) 
-       {
+      if (o instanceof Person) 
+      {
          Person c = (Person) o;
          if ( this.uuid.equals(c.uuid) ) //whatever here
             return true;
-       }
-       return false;
+      }
+      return false;
+   }
+
+   /**
+    * Return our parents.
+    * @return
+    */
+   public ArrayList<Person> getParents () { 
+      ArrayList<Person> parents = new ArrayList<>();
+      Person father = this.getFather();
+      if ( father != null )
+         parents.add(father);
+      Person mother = this.getMother();
+      if ( mother != null)
+         parents.add(mother);
+      return parents;
+   }
+
+   public ArrayList<Person> getCousins() {
+      return  getCousins( 0);
+   }
+
+   public ArrayList<Person> getCousins(int level) {
+      return  getCousins(this.getParents(), level);
+   }
+
+   public ArrayList<Person> getCousins (ArrayList<Person> parents, int level) {
+
+      ArrayList<Person> cousins = new ArrayList<>();
+      if ( level == 0 )
+      { 
+         for ( Person person : parents) {
+            ArrayList<Person> auntsanduncles = person.getRelative(Relationship.SIBLING);
+            for ( Person a : auntsanduncles) {
+               cousins.addAll(a.getRelative(Relationship.CHILD));
+            }
+         }
+      }
+      else {
+         level--;
+         for ( Person parent : parents) {
+            ArrayList<Person> parentsCousins = parent.getCousins(level);
+            for ( Person a : parentsCousins) {
+               a.getRelative(Relationship.CHILD);
+               cousins.addAll(a.getRelative(Relationship.CHILD));
+               System.out.println( cousins );
+            }
+         }
+         
+      }
+
+      return cousins; 
    }
 }

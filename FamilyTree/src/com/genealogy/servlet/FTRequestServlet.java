@@ -26,7 +26,7 @@ public class FTRequestServlet extends HttpServlet {
 
 		//
 		// Seed our database with some dummy data.
-	//	if ( FamilyTreeManager.getTotalCount() < 1 )
+		if ( FamilyTreeManager.getTotalCount() < 1 )
 		   FamilyTreeManager.createTestData();
 	}
 
@@ -75,7 +75,23 @@ public class FTRequestServlet extends HttpServlet {
          System.out.println( members );
          response.getWriter().write( members.toString());
 		}
-		//
+		//JSON SCHEMA 
+		/*
+		{
+		   "type": "person",
+		   "required": [ "id" ],
+		   "properties": {
+		      "id": {
+		         "type": "string",
+		         "description": "The node id"
+		      },
+		      "children": {
+		         "type": "array",
+		         "items": { "$ref": "#" }
+		      }
+		   }
+		 }
+		*/
 	}
 
 	/**

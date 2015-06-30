@@ -288,7 +288,9 @@ public final class FamilyTreeManager {
 
       RelationshipManager.addRelationship(meggriffin,FamilyTreeManager.createPerson("Eric", "Cartman", Sex.MALE), Relationship.CHILD  );
       RelationshipManager.addRelationship(homer,FamilyTreeManager.createPerson("Herb", "Simpson", Sex.MALE), Relationship.SIBLING   );
-      RelationshipManager.addRelationship(marge,FamilyTreeManager.createPerson("Selma", "Bouvier", Sex.FEMALE), Relationship.SIBLING   );
+      Person selma = FamilyTreeManager.createPerson("Selma", "Bouvier", Sex.FEMALE);
+      RelationshipManager.addRelationship(selma, FamilyTreeManager.createPerson("Selma Jr.", "Bouvier", Sex.FEMALE), Relationship.CHILD);
+      RelationshipManager.addRelationship(marge,selma, Relationship.SIBLING   );
       RelationshipManager.addRelationship(marge,FamilyTreeManager.createPerson("Patty", "Bouvier", Sex.FEMALE), Relationship.SIBLING   );
 
       RelationshipManager.addRelationship(grandpasimpson,homer, Relationship.CHILD);
@@ -321,7 +323,7 @@ public final class FamilyTreeManager {
 	 */
 	public static void main( String args[]) {    
 
-		if ( DatasourceManager.getPersistenceManager().getTotalCount() == 0) 
+		//if ( DatasourceManager.getPersistenceManager().getTotalCount() == 0) 
 		{
 			createTestData(); // This creates a person.db file in the system.
 		}
@@ -331,7 +333,7 @@ public final class FamilyTreeManager {
 			findPerson = findPerson(args[0]);
 		}
 		else {
-			findPerson = findPerson("A.*");
+			findPerson = findPerson("Se.*");
 		}
 		
 		for ( Person person : findPerson) {

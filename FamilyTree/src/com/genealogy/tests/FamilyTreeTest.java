@@ -11,6 +11,7 @@ import com.genealogy.manager.RelationshipManager;
 import com.genealogy.model.Person;
 import com.genealogy.model.Relationship;
 import com.genealogy.model.Sex;
+import com.genealogy.persistence.DatasourceManager;
 
 public class FamilyTreeTest {
 
@@ -186,6 +187,94 @@ public class FamilyTreeTest {
       ArrayList<Person> headOfFamilies = FamilyTreeManager.findHeadOfFamilies();
       
       assertEquals("We created 8 people with no parents - hence head of families", 8 , headOfFamilies.size());
+      
+   }
+   
+   @Test
+   public void testCousins() {
+      DatasourceManager.getPersistenceManager().destroyData();
+      System.out.println("Creating test data");
+      Person grandpasimpson = FamilyTreeManager.createPerson("Abraham", "Simpson",Sex.MALE);
+      Person homer = FamilyTreeManager.createPerson("Homer", "Simpson",Sex.MALE);
+      Person marge = FamilyTreeManager.createPerson("Marge", "Simpson", Sex.FEMALE);
+      Person bart = FamilyTreeManager.createPerson("Bart", "Simpson", Sex.MALE);
+      Person maggie = FamilyTreeManager.createPerson("Maggie", "Simpson", Sex.FEMALE);
+      Person lisa = FamilyTreeManager.createPerson("Lisa", "Simpson", Sex.FEMALE);
+      Person stewiegriffin = FamilyTreeManager.createPerson("Stewie", "Griffin", Sex.MALE);
+      Person meggriffin = FamilyTreeManager.createPerson("Meg", "Griffin", Sex.FEMALE);
+      Person daughterinlaw = FamilyTreeManager.createPerson("Lois", "Pewterschmidt", Sex.FEMALE);
+      Person milhouse = FamilyTreeManager.createPerson("Milhouse", "Houten", Sex.MALE);
+      Person wiggum = FamilyTreeManager.createPerson("Chief", "Wiggum", Sex.MALE);
+      Person ralphwiggum = FamilyTreeManager.createPerson("Ralph", "Wiggum", Sex.MALE);
+      Person nelsonmuntz = FamilyTreeManager.createPerson("Nelson", "Muntz", Sex.MALE);
+      RelationshipManager.addRelationship(bart,daughterinlaw, Relationship.SPOUSE);
+
+      RelationshipManager.addRelationship(homer,marge, Relationship.SPOUSE);
+      RelationshipManager.addRelationship(homer, bart, Relationship.CHILD);
+      RelationshipManager.addRelationship(homer, maggie, Relationship.CHILD);
+      RelationshipManager.addRelationship(homer, lisa, Relationship.CHILD);
+      RelationshipManager.addRelationship(wiggum,ralphwiggum, Relationship.CHILD);
+
+      RelationshipManager.addRelationship(bart,stewiegriffin, Relationship.CHILD);
+      RelationshipManager.addRelationship(bart,meggriffin, Relationship.CHILD);
+      Person chrisgriffin = FamilyTreeManager.createPerson("Chris", "Griffin", Sex.MALE);
+      RelationshipManager.addRelationship(bart,chrisgriffin, Relationship.CHILD);
+      RelationshipManager.addRelationship(maggie,milhouse, Relationship.SPOUSE);
+      RelationshipManager.addRelationship(lisa, nelsonmuntz, Relationship.SPOUSE);
+
+      RelationshipManager.addRelationship(meggriffin,ralphwiggum, Relationship.SPOUSE  );
+
+      RelationshipManager.addRelationship(meggriffin,FamilyTreeManager.createPerson("Eric", "Cartman", Sex.MALE), Relationship.CHILD  );
+      RelationshipManager.addRelationship(homer,FamilyTreeManager.createPerson("Herb", "Simpson", Sex.MALE), Relationship.SIBLING   );
+      Person selma = FamilyTreeManager.createPerson("Selma", "chrisgriffinBouvier", Sex.FEMALE);
+      Person selmaJr = FamilyTreeManager.createPerson("Selma Jr.", "Bouvier", Sex.FEMALE);
+      RelationshipManager.addRelationship(selma, selmaJr, Relationship.CHILD);
+      RelationshipManager.addRelationship(marge,selma, Relationship.SIBLING   );
+      RelationshipManager.addRelationship(marge,FamilyTreeManager.createPerson("Patty", "Bouvier", Sex.FEMALE), Relationship.SIBLING   );
+
+      RelationshipManager.addRelationship(grandpasimpson,homer, Relationship.CHILD);
+
+      Person mike = FamilyTreeManager.createPerson("Mike", "Myers",Sex.MALE);
+      Person michelle = FamilyTreeManager.createPerson("Michelle", "Myers",Sex.FEMALE);
+      Person junior = FamilyTreeManager.createPerson("Junior", "Myers",Sex.MALE);
+      RelationshipManager.addRelationship(mike,michelle, Relationship.SPOUSE);
+      RelationshipManager.addRelationship(mike,junior, Relationship.CHILD);
+
+      //
+      // House Stark
+      Person eddardstark = FamilyTreeManager.createPerson("Eddard", "Stark", Sex.MALE);
+      RelationshipManager.addRelationship(eddardstark,FamilyTreeManager.createPerson("Catelyn", "Stark", Sex.FEMALE), Relationship.SPOUSE   );
+      Person robstark = FamilyTreeManager.createPerson("Rob", "Stark", Sex.MALE);
+      RelationshipManager.addRelationship(eddardstark,robstark, Relationship.CHILD   );
+      RelationshipManager.addRelationship(eddardstark,FamilyTreeManager.createPerson("Sansa", "Stark", Sex.FEMALE), Relationship.CHILD   );
+      RelationshipManager.addRelationship(eddardstark,FamilyTreeManager.createPerson("Arya", "Stark", Sex.FEMALE), Relationship.CHILD   );
+      RelationshipManager.addRelationship(eddardstark,FamilyTreeManager.createPerson("Bran", "Stark", Sex.MALE), Relationship.CHILD   );
+      RelationshipManager.addRelationship(eddardstark,FamilyTreeManager.createPerson("Rickon", "Stark", Sex.MALE), Relationship.CHILD   );
+      RelationshipManager.addRelationship(robstark,FamilyTreeManager.createPerson("Talisa", "Stark", Sex.FEMALE), Relationship.SPOUSE);
+        
+      ArrayList<Person> cousins = selmaJr.getCousins();
+      
+      Person selmaThree = FamilyTreeManager.createPerson("Selma III", "Bouvier", Sex.FEMALE);
+      /*
+       * 
+       Selma      Marge
+       SelmaJr    Bart,Lisa,Maggie
+       SelmaThree, 
+       */
+      
+      RelationshipManager.addRelationship(selmaJr,selmaThree, Relationship.CHILD);
+      RelationshipManager.addRelationship(selmaJr,FamilyTreeManager.createPerson("Elma", "Bouvier", Sex.FEMALE), Relationship.CHILD);
+      
+      assertEquals("Ensure has three cousins", 3, cousins.size());
+      
+      ArrayList<Person> secondCousin = chrisgriffin.getCousins(1);
+      
+      assertEquals("Should be 1", 2, secondCousin.size());
+      
+      // chrisgriffin ( bart's son )  is a second cousin of selmathree.
+      // chris and selmathree have the same grandparent.
+      // selmatwo and bart are first cousins.
+      
       
    }
 }
